@@ -7,6 +7,7 @@ import pandas as pd
 import requests
 
 import config
+import db
 
 COLUMNS = [
     "open_time", "open", "high", "low", "close", "volume",
@@ -33,7 +34,12 @@ def get_klines(symbol, interval=None, limit=None):
             df[col] = df[col].astype(float)
         df["open_time"] = pd.to_datetime(df["open_time"], unit="ms")
         return df[["open_time", "open", "high", "low", "close", "volume"]].reset_index(drop=True)
+    except requests.exceptions.HTTPError as e:
+        status = e.response.status_code if e.response is not None else "?"
+        db.log_scan(f"Data fetch failed for {symbol}: HTTP {status} from Binance mirror.")
+        return None
     except Exception as e:
+        db.log_scan(f"Data fetch failed for {symbol}: {type(e).__name__}: {e}")
         return None
 
 
@@ -45,5 +51,6 @@ def get_current_price(symbol):
         )
         resp.raise_for_status()
         return float(resp.json()["price"])
-    except Exception:
+    except Exception as e:
+        db.log_scan(f"Price check failed for {symbol}: {type(e).__name__}: {e}")
         return None
