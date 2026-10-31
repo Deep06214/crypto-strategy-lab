@@ -30,9 +30,16 @@ STARTING_BALANCE_PER_STRATEGY = 10_000.0
 RISK_PER_TRADE_PCT = 0.01   # 1%
 REWARD_RISK_RATIO = 2.0     # take-profit set at 2x the stop distance
 
-# Binance's public market-data endpoints. No API key needed, no account
-# needed -- this is read-only price data, nothing is ever traded for real.
-BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines"
-BINANCE_PRICE_URL = "https://api.binance.com/api/v3/ticker/price"
+# Binance's public, unrestricted market-data mirror. No API key needed, no
+# account needed -- this is read-only price data, nothing is ever traded
+# for real. Deliberately using data-api.binance.vision instead of
+# api.binance.com: the main domain blocks requests from a list of
+# "restricted locations" (HTTP 451), and most free cloud hosts -- including
+# Streamlit Community Cloud -- run on servers in one of those locations
+# regardless of which region you pick. This mirror serves the identical
+# public endpoints without that restriction, so it works the same whether
+# the bot is running on your laptop or in the cloud.
+BINANCE_KLINES_URL = "https://data-api.binance.vision/api/v3/klines"
+BINANCE_PRICE_URL = "https://data-api.binance.vision/api/v3/ticker/price"
 
 DB_PATH = "trading_bot.db"
